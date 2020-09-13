@@ -3,6 +3,8 @@ package remotedata
 import (
 	"fmt"
 	"net/http"
+	"net/url"
+	"path"
 	"strings"
 
 	"github.com/go-resty/resty/v2"
@@ -13,34 +15,40 @@ import (
 // BlaseballAPI represents an HTTP request interface for interacting with a
 // blaseball-centric JSON API
 type BlaseballAPI struct {
-	blaseURL string
-	client   *resty.Client
-	logger   *logrus.Logger
+	blaseURL  string
+	blasePath string
+	client    *resty.Client
+	logger    *logrus.Logger
 }
 
 // NewAPI returns a new API client. If given blaseURL is empty, the official
 // one will be used (https://www.blaseball.com/database/).
-func NewAPI(blaseURL string, logLevel logrus.Level) pkg.RemoteDataSession {
+func NewAPI(blaseURL string, blasePath string, logLevel logrus.Level) pkg.RemoteDataSession {
 	if len(blaseURL) == 0 {
 		blaseURL = "https://www.blaseball.com/database/"
 	}
 	l := logrus.StandardLogger()
 	l.SetLevel(logLevel)
 	return &BlaseballAPI{
-		blaseURL: blaseURL,
-		client:   resty.New().SetHeader("User-Agent", "github.com/spilliams/blaseball"),
-		logger:   l,
+		blaseURL:  blaseURL,
+		blasePath: blasePath,
+		client:    resty.New().SetHeader("User-Agent", "github.com/spilliams/blaseball"),
+		logger:    l,
 	}
 }
 
-func (b *BlaseballAPI) get(url string) (*resty.Response, error) {
-	return b.call(http.MethodGet, url)
+func (b *BlaseballAPI) get(path string, queryParams url.Values) (*resty.Response, error) {
+	return b.call(http.MethodGet, path, queryParams)
 }
 
-func (b *BlaseballAPI) call(method, url string) (*resty.Response, pkg.Coded) {
-	url = fmt.Sprintf("%s%s", b.blaseURL, url)
-	b.logger.Debugf("Calling url %s", url)
-	resp, err := b.client.R().Execute(method, url)
+func (b *BlaseballAPI) call(method, path string, queryParams url.Values) (*resty.Response, error) {
+	fullURL, err := b.buildURL(path, queryParams)
+	if err != nil {
+		return nil, err
+	}
+
+	b.logger.Debugf("Calling url %s", fullURL)
+	resp, err := b.client.R().Execute(method, fullURL)
 	if err != nil {
 		e := fmt.Errorf("could not send request to server: %v", err)
 		return nil, pkg.NewCodedError(e, http.StatusInternalServerError)
@@ -62,4 +70,16 @@ func (b *BlaseballAPI) call(method, url string) (*resty.Response, pkg.Coded) {
 	}
 
 	return resp, nil
+}
+
+func (b *BlaseballAPI) buildURL(finalPath string, queryParams url.Values) (string, error) {
+	build, err := url.Parse(b.blaseURL)
+	if err != nil {
+		return "", err
+	}
+	build.Path = path.Join(b.blasePath, finalPath)
+	if queryParams != nil {
+		build.RawQuery = queryParams.Encode()
+	}
+	return build.String(), nil
 }

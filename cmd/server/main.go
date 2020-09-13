@@ -16,7 +16,7 @@ func main() {
 	}
 
 	local := memdata.NewSession()
-	remote := remotedata.NewAPI("https://www.blaseball.com/database/", logrus.DebugLevel)
+	remote := remotedata.NewAPI("https://www.blaseball.com", "database", logrus.DebugLevel)
 	s := apiserver.NewServer(local, remote)
 	s.StartHTTPServer(port)
 

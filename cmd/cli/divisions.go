@@ -14,6 +14,7 @@ func newDivisionsCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(newDivisionsListCmd())
+	cmd.AddCommand(newDivisionGetCmd())
 
 	return cmd
 }

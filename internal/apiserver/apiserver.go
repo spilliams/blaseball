@@ -31,7 +31,7 @@ func NewServer(local internal.LocalDataSession, remote pkg.RemoteDataSession) *S
 // StartHTTPServer starts a TCP listener on the given port
 func (s *Server) StartHTTPServer(port string) error {
 	router := mux.NewRouter()
-	// TODO logger middleware
+	router.Use(loggerMiddleware)
 	// TODO auth middleware
 	router.Handle("/allDivisions", handler{s.GetDivisions})
 	router.Handle("/division", handler{s.GetDivision})
@@ -51,6 +51,19 @@ func setContentTypeJSON(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		h.ServeHTTP(w, r)
+	})
+}
+
+func loggerMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		logger, err := loggerFromRequest(r)
+		if err != nil {
+			logrus.Warnf("could not make logger from request: %v", err)
+			logger = logrus.NewEntry(logrus.StandardLogger())
+		}
+		r = requestWithLogger(r, logger)
+		logger.Infof("new request from %s", r.UserAgent())
+		next.ServeHTTP(w, r)
 	})
 }
 

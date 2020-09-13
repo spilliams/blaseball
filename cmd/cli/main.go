@@ -83,7 +83,7 @@ func resolveAPI(cmd *cobra.Command) (pkg.RemoteDataSession, error) {
 		return nil, fmt.Errorf("no API URL specified. Please use one of --%s, --%s or --%s", customAPIFlag, localAPIFlag, remoteAPIFlag)
 	}
 
-	apiService := remotedata.NewAPI(apiURL, logrus.GetLevel())
+	apiService := remotedata.NewAPI(apiURL, "", logrus.GetLevel())
 	return apiService, nil
 }
 
