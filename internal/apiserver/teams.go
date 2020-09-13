@@ -15,7 +15,7 @@ func (s *Server) GetTeams(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	if len(teams) == 0 {
-		// TODO of ir divisions are stale?
+		// TODO or if divisions are stale?
 		remoteTeams, err := s.remoteAPI.GetAllTeams()
 		if err != nil {
 			return err

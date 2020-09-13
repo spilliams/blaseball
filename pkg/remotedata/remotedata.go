@@ -25,7 +25,8 @@ type BlaseballAPI struct {
 // one will be used (https://www.blaseball.com/database/).
 func NewAPI(blaseURL string, blasePath string, logLevel logrus.Level) pkg.RemoteDataSession {
 	if len(blaseURL) == 0 {
-		blaseURL = "https://www.blaseball.com/database/"
+		blaseURL = "https://www.blaseball.com/"
+		blasePath = "database"
 	}
 	l := logrus.StandardLogger()
 	l.SetLevel(logLevel)
@@ -37,7 +38,7 @@ func NewAPI(blaseURL string, blasePath string, logLevel logrus.Level) pkg.Remote
 	}
 }
 
-func (b *BlaseballAPI) get(path string, queryParams url.Values) (*resty.Response, error) {
+func (b *BlaseballAPI) Get(path string, queryParams url.Values) (*resty.Response, error) {
 	return b.call(http.MethodGet, path, queryParams)
 }
 
@@ -58,9 +59,11 @@ func (b *BlaseballAPI) call(method, path string, queryParams url.Values) (*resty
 	b.logger.Debugf("Response %d: %s", resp.StatusCode(), resp)
 
 	msg := resp.String()
-	// special case for blaseball official API!
+	// special cases for blaseball official API!
 	if strings.Index(msg, "<title>Offline for Maintenance</title>") > -1 {
 		msg = "Offline for Maintenance"
+	} else if strings.Index(msg, "<!doctype html>") > -1 {
+		return nil, pkg.NewCodedError(fmt.Errorf("URL %s leads to an html page, not JSON data. Are you querying the base API you mean to be?", fullURL), http.StatusNotAcceptable)
 	}
 
 	// check the status code

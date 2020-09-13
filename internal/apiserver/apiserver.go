@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -37,6 +38,8 @@ func (s *Server) StartHTTPServer(port string) error {
 	router.Handle("/division", handler{s.GetDivision})
 	router.Handle("/allTeams", handler{s.GetTeams})
 	router.Handle("/team", handler{s.GetTeam})
+	router.Handle("/allPlayers", handler{s.GetAllPlayers})
+	router.Handle("/players", handler{s.GetPlayers})
 	listener, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		return err
@@ -102,4 +105,12 @@ func marshalAndWrite(obj interface{}, w http.ResponseWriter) error {
 
 func getQueryString(r *http.Request, key string) string {
 	return r.URL.Query().Get(key)
+}
+
+func getQueryStrings(r *http.Request, key string) []string {
+	join := r.URL.Query().Get(key)
+	if join == "" {
+		return []string{}
+	}
+	return strings.Split(join, ",")
 }

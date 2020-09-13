@@ -9,7 +9,7 @@ import (
 )
 
 func (b *BlaseballAPI) GetAllDivisions() ([]*model.Division, error) {
-	resp, err := b.get("allDivisions", nil)
+	resp, err := b.Get("allDivisions", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -22,16 +22,8 @@ func (b *BlaseballAPI) GetAllDivisions() ([]*model.Division, error) {
 }
 
 func (b *BlaseballAPI) GetDivisionByID(id string) (*model.Division, error) {
-	resp, err := b.get("division", map[string][]string{"id": {id}})
+	resp, err := b.Get("division", map[string][]string{"id": {id}})
 
-	if err != nil {
-		return nil, err
-	}
-	return divisionFromResponse(resp)
-}
-
-func (b *BlaseballAPI) GetDivisionByName(name string) (*model.Division, error) {
-	resp, err := b.get("division", map[string][]string{"name": {name}})
 	if err != nil {
 		return nil, err
 	}

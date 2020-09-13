@@ -10,16 +10,19 @@ import (
 )
 
 func (mds *MemoryDataSession) GetAllTeams() ([]*model.Team, error) {
-	return mds.allTeams, nil
+	teams := make([]*model.Team, 0, len(mds.allTeams))
+	for _, t := range mds.allTeams {
+		teams = append(teams, t)
+	}
+	return teams, nil
 }
 
 func (mds *MemoryDataSession) GetTeamByID(id string) (*model.Team, error) {
-	for _, t := range mds.allTeams {
-		if t.ID == id {
-			return t, nil
-		}
+	team, ok := mds.allTeams[id]
+	if !ok {
+		return nil, pkg.NewCodedError(fmt.Errorf("no team with id %s", id), http.StatusNotFound)
 	}
-	return nil, pkg.NewCodedError(fmt.Errorf("no team with id %s", id), http.StatusNotFound)
+	return team, nil
 }
 
 func (mds *MemoryDataSession) GetTeamByFullName(name string) (*model.Team, error) {
@@ -40,13 +43,7 @@ func (mds *MemoryDataSession) GetTeamByNickname(name string) (*model.Team, error
 	return nil, pkg.NewCodedError(fmt.Errorf("no team with name %s", name), http.StatusNotFound)
 }
 
-func (mds *MemoryDataSession) PutTeam(n *model.Team) error {
-	for i, t := range mds.allTeams {
-		if t.ID == n.ID {
-			mds.allTeams[i] = n
-			return nil
-		}
-	}
-	mds.allTeams = append(mds.allTeams, n)
+func (mds *MemoryDataSession) PutTeam(team *model.Team) error {
+	mds.allTeams[team.ID] = team
 	return nil
 }

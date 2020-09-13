@@ -4,12 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/go-resty/resty/v2"
 	"github.com/spilliams/blaseball/pkg/model"
 )
 
 func (b *BlaseballAPI) GetAllTeams() ([]*model.Team, error) {
-	resp, err := b.get("allTeams", nil)
+	resp, err := b.Get("allTeams", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -22,31 +21,11 @@ func (b *BlaseballAPI) GetAllTeams() ([]*model.Team, error) {
 }
 
 func (b *BlaseballAPI) GetTeamByID(id string) (*model.Team, error) {
-	resp, err := b.get("team", map[string][]string{"id": {id}})
+	resp, err := b.Get("team", map[string][]string{"id": {id}})
 	if err != nil {
 		return nil, err
 	}
-	return teamFromResponse(resp)
-}
-
-func (b *BlaseballAPI) GetTeamByFullName(name string) (*model.Team, error) {
-	resp, err := b.get("team", map[string][]string{"name": {name}})
-	if err != nil {
-		return nil, err
-	}
-	return teamFromResponse(resp)
-}
-
-func (b *BlaseballAPI) GetTeamByNickname(name string) (*model.Team, error) {
-	resp, err := b.get("team", map[string][]string{"name": {name}})
-	if err != nil {
-		return nil, err
-	}
-	return teamFromResponse(resp)
-}
-
-func teamFromResponse(resp *resty.Response) (*model.Team, error) {
 	var team *model.Team
-	err := json.Unmarshal(resp.Body(), &team)
+	err = json.Unmarshal(resp.Body(), &team)
 	return team, err
 }

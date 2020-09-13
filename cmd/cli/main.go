@@ -7,8 +7,8 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/spilliams/blaseball/pkg"
-	"github.com/spilliams/blaseball/pkg/remotedata"
+	"github.com/spilliams/blaseball/internal"
+	"github.com/spilliams/blaseball/internal/localdata"
 )
 
 type contextLabel string
@@ -36,6 +36,8 @@ func main() {
 	cobra.OnInitialize(initLogger)
 
 	rootCmd.AddCommand(newDivisionsCmd())
+	rootCmd.AddCommand(newTeamsCmd())
+	rootCmd.AddCommand(newPlayersCmd())
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
@@ -67,7 +69,7 @@ func initLogger() {
 	}
 }
 
-func resolveAPI(cmd *cobra.Command) (pkg.RemoteDataSession, error) {
+func resolveAPI(cmd *cobra.Command) (internal.ReadableDataSession, error) {
 	// resolve API url
 	apiURL := ""
 	if len(customAPIURL) != 0 {
@@ -83,7 +85,7 @@ func resolveAPI(cmd *cobra.Command) (pkg.RemoteDataSession, error) {
 		return nil, fmt.Errorf("no API URL specified. Please use one of --%s, --%s or --%s", customAPIFlag, localAPIFlag, remoteAPIFlag)
 	}
 
-	apiService := remotedata.NewAPI(apiURL, "", logrus.GetLevel())
+	apiService := localdata.NewAPI(apiURL, "", logrus.GetLevel())
 	return apiService, nil
 }
 

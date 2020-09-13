@@ -1,25 +1,22 @@
 package pkg
 
-import "github.com/spilliams/blaseball/pkg/model"
+import (
+	"net/url"
 
-// RemoteDataSession represents a data session with a remote data source (such
-// as the official Blaseball API).
+	"github.com/go-resty/resty/v2"
+	"github.com/spilliams/blaseball/pkg/model"
+)
+
+// RemoteDataSession represents a data session with a remote source. This is
+// intended to be 1:1 api-compatible with the official Blaseball API.
 type RemoteDataSession interface {
-	DataSessionDivisionsRead
-	DataSessionTeamsRead
-}
+	Get(string, url.Values) (*resty.Response, error)
 
-// DataSessionDivisionsRead represents a data session that can read things
-// about Divisions.
-type DataSessionDivisionsRead interface {
 	GetAllDivisions() ([]*model.Division, error)
 	GetDivisionByID(string) (*model.Division, error)
-	GetDivisionByName(string) (*model.Division, error)
-}
 
-type DataSessionTeamsRead interface {
+	GetPlayersByID([]string) ([]*model.Player, error)
+
 	GetAllTeams() ([]*model.Team, error)
 	GetTeamByID(string) (*model.Team, error)
-	GetTeamByFullName(string) (*model.Team, error)
-	GetTeamByNickname(string) (*model.Team, error)
 }
