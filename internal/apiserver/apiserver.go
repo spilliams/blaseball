@@ -10,25 +10,26 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"github.com/spilliams/blaseball/internal"
-	"github.com/spilliams/blaseball/internal/memdata"
 	"github.com/spilliams/blaseball/pkg"
-	"github.com/spilliams/blaseball/pkg/api"
 )
 
+// Server represents a web server that can handle requests about blaseball.
 type Server struct {
 	dataSession internal.LocalDataSession
 	remoteAPI   pkg.RemoteDataSession
 }
 
-func newServer() *Server {
+// NewServer returns a new server with the given local data session (for
+// storing) and remote data session (for fetching)
+func NewServer(local internal.LocalDataSession, remote pkg.RemoteDataSession) *Server {
 	return &Server{
-		dataSession: memdata.NewSession(),
-		remoteAPI:   api.NewAPI("https://www.blaseball.com/database/", logrus.DebugLevel),
+		dataSession: local,
+		remoteAPI:   remote,
 	}
 }
 
-func StartHTTPServer(port string) error {
-	s := newServer()
+// StartHTTPServer starts a TCP listener on the given port
+func (s *Server) StartHTTPServer(port string) error {
 	router := mux.NewRouter()
 	// TODO logger middleware
 	// TODO auth middleware

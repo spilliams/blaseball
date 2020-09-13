@@ -10,22 +10,26 @@ import (
 	"github.com/spilliams/blaseball/pkg"
 )
 
+// BlaseballAPI represents an HTTP request interface for interacting with a
+// blaseball-centric JSON API
 type BlaseballAPI struct {
-	blase  string
-	client *resty.Client
-	logger *logrus.Logger
+	blaseURL string
+	client   *resty.Client
+	logger   *logrus.Logger
 }
 
-func NewAPI(base string, logLevel logrus.Level) pkg.RemoteDataSession {
-	if len(base) == 0 {
-		base = "https://www.blaseball.com/database/"
+// NewAPI returns a new API client. If given blaseURL is empty, the official
+// one will be used (https://www.blaseball.com/database/).
+func NewAPI(blaseURL string, logLevel logrus.Level) pkg.RemoteDataSession {
+	if len(blaseURL) == 0 {
+		blaseURL = "https://www.blaseball.com/database/"
 	}
 	l := logrus.StandardLogger()
 	l.SetLevel(logLevel)
 	return &BlaseballAPI{
-		blase:  base,
-		client: resty.New().SetHeader("User-Agent", "github.com/spilliams/blaseball"),
-		logger: l,
+		blaseURL: blaseURL,
+		client:   resty.New().SetHeader("User-Agent", "github.com/spilliams/blaseball"),
+		logger:   l,
 	}
 }
 
@@ -34,7 +38,7 @@ func (b *BlaseballAPI) get(url string) (*resty.Response, error) {
 }
 
 func (b *BlaseballAPI) call(method, url string) (*resty.Response, pkg.Coded) {
-	url = fmt.Sprintf("%s%s", b.blase, url)
+	url = fmt.Sprintf("%s%s", b.blaseURL, url)
 	b.logger.Debugf("Calling url %s", url)
 	resp, err := b.client.R().Execute(method, url)
 	if err != nil {

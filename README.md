@@ -13,14 +13,19 @@ use, I should (will) set up a more reliable data storage layer.
 Building `cmd/cli` will build you a command-line tool that will query against
 a blaseball API. It defaults to the official one, but you can use flags to set
 a custom url or pick a hardcoded local url. This tool will tell you many of
-the things that the server could tell you, but in your terminal instead of in a
-browser. Honestly it's only here as a test bed before I build an honest
-front-end for the server.
+the things that the aforementioned server could tell you, but it does so in
+your terminal instead of in a browser. Honestly it's only here as a test bed
+before I build an honest front-end for the server.
 
 # Contributions
 
-At this time I am not accepting contributions. I don't even know how blaseball works yet, and this is just a fun pet project to distract myself from systemic
+At this time I am not accepting contributions. I don't even know how blaseball
+works yet, and this is just a fun pet project to distract myself from systemic
 racism, global pandemics, and devastating wildfires.
+
+If you feel very strongly about it, you could start a new issue, or set up a
+fork and Pull Request, but honestly I don't know how much time I can devote to
+open-source style maintenance on top of just-farting-around style maintenance.
 
 # Server features
 
@@ -32,4 +37,4 @@ blaseball API:
 In the future, I plan on adding more several extra features, such as:
 
 - forbidden knowledge will be hidden unless a query parameter is passed in
-- time-series data such as a list of teams and roles a player has played for over time
+- time-series and historical data on players
