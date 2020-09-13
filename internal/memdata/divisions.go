@@ -2,7 +2,9 @@ package memdata
 
 import (
 	"fmt"
+	"net/http"
 
+	"github.com/spilliams/blaseball/pkg"
 	"github.com/spilliams/blaseball/pkg/model"
 )
 
@@ -16,7 +18,16 @@ func (mds *MemoryDataSession) GetDivisionByID(id string) (*model.Division, error
 			return d, nil
 		}
 	}
-	return nil, fmt.Errorf("no division with id %s", id)
+	return nil, pkg.NewCodedError(fmt.Errorf("no division with id %s", id), http.StatusNotFound)
+}
+
+func (mds *MemoryDataSession) GetDivisionByName(name string) (*model.Division, error) {
+	for _, d := range mds.allDivisions {
+		if d.Name == name {
+			return d, nil
+		}
+	}
+	return nil, pkg.NewCodedError(fmt.Errorf("no division with name %s", name), http.StatusNotFound)
 }
 
 func (mds *MemoryDataSession) PutDivision(n *model.Division) error {

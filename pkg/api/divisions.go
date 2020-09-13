@@ -26,7 +26,20 @@ func (b *BlaseballAPI) GetDivisionByID(id string) (*model.Division, error) {
 		return nil, err
 	}
 	var division *model.Division
-	if err = json.Unmarshal(resp.Body(), &division); err != nil {
+	if err := json.Unmarshal(resp.Body(), &division); err != nil {
+		return nil, fmt.Errorf("couldn't unmarshal response: %v", err)
+	}
+
+	return division, nil
+}
+
+func (b *BlaseballAPI) GetDivisionByName(name string) (*model.Division, error) {
+	resp, err := b.get(fmt.Sprintf("division?name=%s", name))
+	if err != nil {
+		return nil, err
+	}
+	var division *model.Division
+	if err := json.Unmarshal(resp.Body(), &division); err != nil {
 		return nil, fmt.Errorf("couldn't unmarshal response: %v", err)
 	}
 

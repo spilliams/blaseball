@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spilliams/blaseball/internal"
 	"github.com/spilliams/blaseball/pkg/api"
@@ -45,11 +46,6 @@ func newRootCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "blase",
 		Short: "A tool for getting details about blaseball",
-		// Uncomment the following if the root cmd should have its own logic
-		// that happens when someone runs it with no subcommand
-		// RunE: func(cmd *cobra.Command, args []string) error {
-		// 	return nil
-		// },
 	}
 
 	cmd.PersistentFlags().BoolVarP(&flags.forbiddenKnowledge, "forbidden-knowledge", "f", false, "Display forbidden knowledge")
@@ -88,10 +84,21 @@ func resolveAPI(cmd *cobra.Command) (internal.RemoteDataSession, error) {
 	} else {
 		return nil, fmt.Errorf("no API URL specified. Please use one of --%s, --%s or --%s", customAPIFlag, localAPIFlag, remoteAPIFlag)
 	}
-	apiService := api.NewAPI(apiURL)
+
+	verbose, err := cmd.Flags().GetBool(verboseFlag)
+	if err != nil {
+		return nil, err
+	}
+	level := logrus.InfoLevel
+	if verbose {
+		level = logrus.DebugLevel
+	}
+
+	apiService := api.NewAPI(apiURL, level)
 	return apiService, nil
 }
 
+// TODO: use logrus levels for the CLI too
 func vlog(cmd *cobra.Command, format string, parts ...interface{}) {
 	verbose, err := cmd.Flags().GetBool(verboseFlag)
 	if err != nil {
@@ -106,4 +113,9 @@ func vlog(cmd *cobra.Command, format string, parts ...interface{}) {
 		msg += "\n"
 	}
 	fmt.Print(msg)
+}
+
+func isGUID(s string) bool {
+	// TODO
+	return false
 }

@@ -1,21 +1,19 @@
 package internal
 
-import "github.com/spilliams/blaseball/pkg/model"
+import (
+	"github.com/spilliams/blaseball/pkg"
+	"github.com/spilliams/blaseball/pkg/model"
+)
 
 type LocalDataSession interface {
-	DataSessionDivisionsRead
-	DataSessionDivisionsWrite
+	pkg.DataSessionDivisionsRead
+	dataSessionDivisionsWrite
 }
 
 type RemoteDataSession interface {
-	DataSessionDivisionsRead
+	pkg.DataSessionDivisionsRead
 }
 
-type DataSessionDivisionsRead interface {
-	GetAllDivisions() ([]*model.Division, error)
-	GetDivisionByID(string) (*model.Division, error)
-}
-
-type DataSessionDivisionsWrite interface {
+type dataSessionDivisionsWrite interface {
 	PutDivision(*model.Division) error
 }
