@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spilliams/blaseball/pkg"
-	"github.com/spilliams/blaseball/pkg/api"
+	"github.com/spilliams/blaseball/pkg/remotedata"
 )
 
 type contextLabel string
@@ -83,7 +83,7 @@ func resolveAPI(cmd *cobra.Command) (pkg.RemoteDataSession, error) {
 		return nil, fmt.Errorf("no API URL specified. Please use one of --%s, --%s or --%s", customAPIFlag, localAPIFlag, remoteAPIFlag)
 	}
 
-	apiService := api.NewAPI(apiURL, logrus.GetLevel())
+	apiService := remotedata.NewAPI(apiURL, logrus.GetLevel())
 	return apiService, nil
 }
 

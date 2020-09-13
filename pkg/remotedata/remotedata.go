@@ -1,4 +1,4 @@
-package api
+package remotedata
 
 import (
 	"fmt"
