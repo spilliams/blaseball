@@ -35,6 +35,8 @@ func (s *Server) StartHTTPServer(port string) error {
 	// TODO auth middleware
 	router.Handle("/allDivisions", handler{s.GetDivisions})
 	router.Handle("/division", handler{s.GetDivision})
+	router.Handle("/allTeams", handler{s.GetTeams})
+	router.Handle("/team", handler{s.GetTeam})
 	listener, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		return err
@@ -56,11 +58,7 @@ func setContentTypeJSON(h http.Handler) http.Handler {
 
 func loggerMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		logger, err := loggerFromRequest(r)
-		if err != nil {
-			logrus.Warnf("could not make logger from request: %v", err)
-			logger = logrus.NewEntry(logrus.StandardLogger())
-		}
+		logger := loggerFromRequest(r)
 		r = requestWithLogger(r, logger)
 		logger.Infof("new request from %s", r.UserAgent())
 		next.ServeHTTP(w, r)

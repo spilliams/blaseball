@@ -15,7 +15,7 @@ func (s *Server) GetDivisions(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	if len(divisions) == 0 {
-		// TODO or if divisions are stale
+		// TODO or if divisions are stale?
 		remoteDivisions, err := s.remoteAPI.GetAllDivisions()
 		if err != nil {
 			return err
@@ -49,7 +49,8 @@ func (s *Server) GetDivision(w http.ResponseWriter, r *http.Request) error {
 		div, err = s.dataSession.GetDivisionByName(name)
 	}
 	if err != nil {
-		return err
+		l := loggerFromRequest(r)
+		l.Warn("couldn't fetch division: %v", err)
 	}
 	if div != nil {
 		return marshalAndWrite(div, w)

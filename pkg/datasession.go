@@ -6,6 +6,7 @@ import "github.com/spilliams/blaseball/pkg/model"
 // as the official Blaseball API).
 type RemoteDataSession interface {
 	DataSessionDivisionsRead
+	DataSessionTeamsRead
 }
 
 // DataSessionDivisionsRead represents a data session that can read things
@@ -14,4 +15,11 @@ type DataSessionDivisionsRead interface {
 	GetAllDivisions() ([]*model.Division, error)
 	GetDivisionByID(string) (*model.Division, error)
 	GetDivisionByName(string) (*model.Division, error)
+}
+
+type DataSessionTeamsRead interface {
+	GetAllTeams() ([]*model.Team, error)
+	GetTeamByID(string) (*model.Team, error)
+	GetTeamByFullName(string) (*model.Team, error)
+	GetTeamByNickname(string) (*model.Team, error)
 }

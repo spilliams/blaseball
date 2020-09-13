@@ -14,24 +14,29 @@ const (
 	loggerKey ctxKey = "logger"
 )
 
-func loggerFromRequest(r *http.Request) (*logrus.Entry, error) {
+func loggerFromRequest(r *http.Request) *logrus.Entry {
 	logger, ok := r.Context().Value(loggerKey).(*logrus.Entry)
 
 	if !ok {
 		// make one
 		u, err := uuid.NewV4()
-		if err != nil {
-			return nil, err
+		uString := "unknown"
+		if u == [16]byte{} {
+			uString = u.String()
 		}
 
 		logger = logrus.WithFields(logrus.Fields{
 			"method":      r.Method,
 			"path":        r.URL.EscapedPath(),
-			"requestUUID": u.String(),
+			"requestUUID": uString,
 		})
+
+		if err != nil {
+			logger.Warnf("could not generate uuid for logger: %v", err)
+		}
 	}
 
-	return logger, nil
+	return logger
 }
 
 func requestWithLogger(r *http.Request, logger *logrus.Entry) *http.Request {

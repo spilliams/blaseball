@@ -10,8 +10,14 @@ import (
 type LocalDataSession interface {
 	pkg.DataSessionDivisionsRead
 	dataSessionDivisionsWrite
+	pkg.DataSessionTeamsRead
+	dataSessionTeamsWrite
 }
 
 type dataSessionDivisionsWrite interface {
 	PutDivision(*model.Division) error
+}
+
+type dataSessionTeamsWrite interface {
+	PutTeam(*model.Team) error
 }

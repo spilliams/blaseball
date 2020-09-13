@@ -3,6 +3,7 @@ package memdata
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/spilliams/blaseball/pkg"
 	"github.com/spilliams/blaseball/pkg/model"
@@ -23,7 +24,7 @@ func (mds *MemoryDataSession) GetDivisionByID(id string) (*model.Division, error
 
 func (mds *MemoryDataSession) GetDivisionByName(name string) (*model.Division, error) {
 	for _, d := range mds.allDivisions {
-		if d.Name == name {
+		if strings.EqualFold(d.Name, name) {
 			return d, nil
 		}
 	}
