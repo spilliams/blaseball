@@ -17,7 +17,7 @@ import (
 
 type Server struct {
 	dataSession internal.LocalDataSession
-	remoteAPI   internal.RemoteDataSession
+	remoteAPI   pkg.RemoteDataSession
 }
 
 func newServer() *Server {

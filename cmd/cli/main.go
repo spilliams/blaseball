@@ -6,7 +6,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/spilliams/blaseball/internal"
+	"github.com/spilliams/blaseball/pkg"
 	"github.com/spilliams/blaseball/pkg/api"
 )
 
@@ -57,7 +57,7 @@ func newRootCmd() *cobra.Command {
 	return cmd
 }
 
-func resolveAPI(cmd *cobra.Command) (internal.RemoteDataSession, error) {
+func resolveAPI(cmd *cobra.Command) (pkg.RemoteDataSession, error) {
 	customAPIURL, err := cmd.Flags().GetString(customAPIFlag)
 	if err != nil {
 		return nil, err
