@@ -36,5 +36,7 @@ func (mds *MemoryDataSession) GetDivisionByName(name string) (*model.Division, e
 
 func (mds *MemoryDataSession) PutDivision(div *model.Division) error {
 	mds.allDivisions[div.ID] = div
+	// TODO: make sure there are team entries for all team ids in the division?
+	// follow-up: make sure when fetching a team, if it only has an ID then it's stale
 	return nil
 }

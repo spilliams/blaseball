@@ -32,14 +32,16 @@ func NewServer(local internal.LocalDataSession, remote pkg.RemoteDataSession) *S
 // StartHTTPServer starts a TCP listener on the given port
 func (s *Server) StartHTTPServer(port string) error {
 	router := mux.NewRouter()
+
 	router.Use(loggerMiddleware)
-	// TODO auth middleware
+
 	router.Handle("/allDivisions", handler{s.GetDivisions})
 	router.Handle("/division", handler{s.GetDivision})
 	router.Handle("/allTeams", handler{s.GetTeams})
 	router.Handle("/team", handler{s.GetTeam})
 	router.Handle("/allPlayers", handler{s.GetAllPlayers})
 	router.Handle("/players", handler{s.GetPlayers})
+
 	listener, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		return err
