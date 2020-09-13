@@ -7,10 +7,8 @@ import (
 	"github.com/spilliams/blaseball/pkg/model"
 )
 
-// ListAllDivisions returns a list of all team divisions
-func ListAllDivisions() ([]*model.Division, error) {
-	url := "https://www.blaseball.com/database/allDivisions"
-	resp, err := get(url)
+func (b *BlaseballAPI) GetAllDivisions() ([]*model.Division, error) {
+	resp, err := b.get("allDivisions")
 	if err != nil {
 		return nil, err
 	}
@@ -20,4 +18,17 @@ func ListAllDivisions() ([]*model.Division, error) {
 	}
 
 	return divisions, nil
+}
+
+func (b *BlaseballAPI) GetDivisionByID(id string) (*model.Division, error) {
+	resp, err := b.get(fmt.Sprintf("division?id=%s", id))
+	if err != nil {
+		return nil, err
+	}
+	var division *model.Division
+	if err = json.Unmarshal(resp.Body(), &division); err != nil {
+		return nil, fmt.Errorf("couldn't unmarshal response: %v", err)
+	}
+
+	return division, nil
 }

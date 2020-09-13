@@ -1,17 +1,30 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/spilliams/blaseball/pkg/api"
+)
+
+type contextLabel string
+
+const (
+	apiLabel contextLabel = "api"
 )
 
 func main() {
 	rootCmd := newRootCmd()
+
+	// TODO: consider putting this in config
+	api := api.NewAPI("http://localhost:8080/")
+	ctx := context.WithValue(context.Background(), apiLabel, api)
+
 	rootCmd.AddCommand(newDivisionsCmd())
 
-	if err := rootCmd.Execute(); err != nil {
+	if err := rootCmd.ExecuteContext(ctx); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
