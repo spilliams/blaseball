@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/spilliams/blaseball/internal"
 )
 
 func newDivisionsCmd() *cobra.Command {
@@ -26,7 +25,10 @@ func newDivisionsListCmd() *cobra.Command {
 		Use:   "list",
 		Short: "List all divisions",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			api := cmd.Context().Value(apiLabel).(internal.RemoteDataSession)
+			api, err := resolveAPI(cmd)
+			if err != nil {
+				return err
+			}
 			divs, err := api.GetAllDivisions()
 			if err != nil {
 				return err

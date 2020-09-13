@@ -4,17 +4,18 @@ This repository holds code that does stuff. I'm not really sure if you can use
 `go get` to fetch the binaries, or if you have to build them yourself.
 
 Building `cmd/server` will build you a web server that operates on port 8080
-(maybe someday that'll be configurable). This server will (someday) mirror the
+(or whatever `PORT` says). This server will (someday) mirror the
 [blaseball database API](https://github.com/Society-for-Internet-Blaseball-Research/blaseball-api-spec). It will also
 provide a few key extra features, discussed below. Right now this server stores
 its data in memory. If and when I deploy this server somewhere for more general
 use, I should (will) set up a more reliable data storage layer.
 
 Building `cmd/cli` will build you a command-line tool that will query against
-a blaseball API. I say "a" blaseball API because right now it will build
-against the local server (it assumes you're running one). Someday this will be
-configurable, so you can tell it to hit your local server, or the official API,
-or maybe a hosted third-party API. The future is so uncertain!
+a blaseball API. It defaults to the official one, but you can use flags to set
+a custom url or pick a hardcoded local url. This tool will tell you many of
+the things that the server could tell you, but in your terminal instead of in a
+browser. Honestly it's only here as a test bed before I build an honest
+front-end for the server.
 
 # Contributions
 
