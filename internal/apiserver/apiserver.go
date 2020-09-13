@@ -1,6 +1,7 @@
 package apiserver
 
 import (
+	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
@@ -67,4 +68,13 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	errMsg := fmt.Sprintf(`{"error": "%s"}`, err)
 	http.Error(w, errMsg, code)
+}
+
+func marshalAndWrite(obj interface{}, w http.ResponseWriter) error {
+	bytes, err := json.Marshal(obj)
+	if err != nil {
+		return fmt.Errorf("could not marshal response: %v", err)
+	}
+	_, err = w.Write(bytes)
+	return err
 }
