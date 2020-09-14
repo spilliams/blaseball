@@ -21,7 +21,7 @@ func loggerFromRequest(r *http.Request) *logrus.Entry {
 		// make one
 		u, err := uuid.NewV4()
 		uString := "unknown"
-		if u == [16]byte{} {
+		if u != [16]byte{} {
 			uString = u.String()
 		}
 
