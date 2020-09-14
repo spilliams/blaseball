@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/sirupsen/logrus"
@@ -18,7 +19,11 @@ func main() {
 	local := memdata.NewSession()
 	remote := remotedata.NewAPI("https://www.blaseball.com", "database", logrus.DebugLevel)
 	s := apiserver.NewServer(local, remote)
-	s.StartHTTPServer(port)
+	err := s.StartHTTPServer(port)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
 	// Stay on forever
 	forever := make(chan bool)
