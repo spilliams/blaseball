@@ -17,21 +17,21 @@ type Team struct {
 
 	Lineup   []string
 	Rotation []string
-	Bullpen  []string
-	Bench    []string
+	Bullpen  []string // fk
+	Bench    []string // fk
 
-	ShameRuns      int
-	TotalShames    int
-	TotalShamings  int
-	SeasonShames   int
-	SeasonShamings int
-	Championships  int
-	RotationSlot   int
+	ShameRuns      int // fk
+	TotalShames    int // fk
+	TotalShamings  int // fk
+	SeasonShames   int // fk
+	SeasonShamings int // fk
+	Championships  int // fk
+	RotationSlot   int // fk
 
-	WeekAttributes      []string `json:"weekAttr"`
-	GameAttributes      []string `json:"gameAttr"`
-	SeasonAttributes    []string `json:"seasAttr"`
-	PermanentAttributes []string `json:"permAttr"`
+	WeekAttributes      []string `json:"weekAttr"` // fk
+	GameAttributes      []string `json:"gameAttr"` // fk
+	SeasonAttributes    []string `json:"seasAttr"` // fk
+	PermanentAttributes []string `json:"permAttr"` // fk
 }
 
 func (t *Team) String() string {
