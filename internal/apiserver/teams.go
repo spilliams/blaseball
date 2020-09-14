@@ -14,7 +14,7 @@ func (s *Server) GetTeams(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	if len(teams) == 0 {
+	if len(teams.List) == 0 {
 		remoteTeams, err := s.remoteAPI.GetAllTeams()
 		if err != nil {
 			return err
@@ -30,7 +30,7 @@ func (s *Server) GetTeams(w http.ResponseWriter, r *http.Request) error {
 		}
 	}
 
-	return marshalAndWrite(teams, w)
+	return marshalAndWrite(teams, w, r)
 }
 
 func (s *Server) GetTeam(w http.ResponseWriter, r *http.Request) error {
@@ -66,7 +66,7 @@ func (s *Server) GetTeam(w http.ResponseWriter, r *http.Request) error {
 		return pkg.NewCodedError(fmt.Errorf("no Team found with %s '%s'. Try looking it up by ID?", paramName, paramValue), http.StatusNotFound)
 	}
 
-	return marshalAndWrite(team, w)
+	return marshalAndWrite(team, w, r)
 }
 
 func (s *Server) getTeamByID(id string, w http.ResponseWriter, r *http.Request) error {
@@ -77,7 +77,7 @@ func (s *Server) getTeamByID(id string, w http.ResponseWriter, r *http.Request) 
 		l.Warn("couldn't fetch team by id: %v", err)
 	}
 	if !fetchFromRemote {
-		return marshalAndWrite(team, w)
+		return marshalAndWrite(team, w, r)
 	}
 
 	team, err = s.remoteAPI.GetTeamByID(id)
@@ -88,5 +88,5 @@ func (s *Server) getTeamByID(id string, w http.ResponseWriter, r *http.Request) 
 		return err
 	}
 
-	return marshalAndWrite(team, w)
+	return marshalAndWrite(team, w, r)
 }

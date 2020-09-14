@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gorilla/handlers"
@@ -12,17 +13,18 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spilliams/blaseball/internal"
 	"github.com/spilliams/blaseball/pkg"
+	"github.com/spilliams/blaseball/pkg/model"
 )
 
 // Server represents a web server that can handle requests about blaseball.
 type Server struct {
-	dataStore internal.LocalDataSession
-	remoteAPI pkg.RemoteDataSession
+	dataStore internal.DataStorageSession
+	remoteAPI pkg.OfficialDataSession
 }
 
 // NewServer returns a new server with the given local data session (for
 // storing) and remote data session (for fetching)
-func NewServer(local internal.LocalDataSession, remote pkg.RemoteDataSession) *Server {
+func NewServer(local internal.DataStorageSession, remote pkg.OfficialDataSession) *Server {
 	return &Server{
 		dataStore: local,
 		remoteAPI: remote,
@@ -96,13 +98,39 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, errMsg, code)
 }
 
-func marshalAndWrite(obj interface{}, w http.ResponseWriter) error {
+func marshalAndWrite(obj interface{}, w http.ResponseWriter, r *http.Request) error {
+	// TODO: showing forbidden works, but stuff stays shown...
+	showFK := showForbiddenKnowledge(r)
+	if showFK {
+		objFK, ok := obj.(model.Unforbiddable)
+		if !ok {
+			l := loggerFromRequest(r)
+			l.Warnf("supposed to show forbidden knowledge but object (%T) is not unforbiddable", obj)
+		} else {
+			objFK.Unforbid()
+		}
+	}
+	// TODO: is obj unforbidden now? or just objFK?
 	bytes, err := json.Marshal(obj)
 	if err != nil {
 		return fmt.Errorf("could not marshal response: %v", err)
 	}
 	_, err = w.Write(bytes)
 	return err
+}
+
+func getQueryBool(r *http.Request, key string) bool {
+	s := r.URL.Query().Get(key)
+	if s == "" {
+		return false
+	}
+	b, err := strconv.ParseBool(s)
+	if err != nil {
+		l := loggerFromRequest(r)
+		l.Warnf("could not parse bool from query param %s value %s: %v", key, s, err)
+		return false
+	}
+	return b
 }
 
 func getQueryString(r *http.Request, key string) string {
@@ -115,4 +143,8 @@ func getQueryStrings(r *http.Request, key string) []string {
 		return []string{}
 	}
 	return strings.Split(join, ",")
+}
+
+func showForbiddenKnowledge(r *http.Request) bool {
+	return getQueryBool(r, "showForbiddenKnowledge")
 }

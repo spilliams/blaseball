@@ -28,7 +28,7 @@ func newDivisionsListCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			divs, err := api.GetAllDivisions()
+			divs, err := api.GetAllDivisions(forbiddenKnowledge)
 			if err != nil {
 				return err
 			}
@@ -50,9 +50,9 @@ func newDivisionGetCmd() *cobra.Command {
 			}
 			var div *model.Division
 			if isGUID(args[0]) {
-				div, err = api.GetDivisionByID(args[0])
+				div, err = api.GetDivisionByID(args[0], forbiddenKnowledge)
 			} else {
-				div, err = api.GetDivisionByName(args[0])
+				div, err = api.GetDivisionByName(args[0], forbiddenKnowledge)
 			}
 			if err != nil {
 				return err

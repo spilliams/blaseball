@@ -7,7 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spilliams/blaseball/internal/apiserver"
 	"github.com/spilliams/blaseball/internal/memdata"
-	"github.com/spilliams/blaseball/pkg/remotedata"
+	"github.com/spilliams/blaseball/pkg/officialdata"
 )
 
 func main() {
@@ -17,7 +17,7 @@ func main() {
 	}
 
 	local := memdata.NewSession()
-	remote := remotedata.NewAPI("https://www.blaseball.com", "database", logrus.DebugLevel)
+	remote := officialdata.NewAPI("https://www.blaseball.com", "database", logrus.DebugLevel)
 	s := apiserver.NewServer(local, remote)
 	err := s.StartHTTPServer(port)
 	if err != nil {

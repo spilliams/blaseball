@@ -9,12 +9,12 @@ import (
 	"github.com/spilliams/blaseball/pkg/model"
 )
 
-func (mds *MemoryDataStore) GetAllDivisions() ([]*model.Division, error) {
+func (mds *MemoryDataStore) GetAllDivisions() (*model.DivisionList, error) {
 	divisions := make([]*model.Division, 0, len(mds.allDivisions))
 	for _, d := range mds.allDivisions {
 		divisions = append(divisions, d)
 	}
-	return divisions, nil
+	return &model.DivisionList{divisions}, nil
 }
 
 func (mds *MemoryDataStore) GetDivisionByID(id string) (*model.Division, error) {

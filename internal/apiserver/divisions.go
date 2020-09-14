@@ -14,7 +14,7 @@ func (s *Server) GetDivisions(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	if len(divisions) == 0 {
+	if len(divisions.List) == 0 {
 		remoteDivisions, err := s.remoteAPI.GetAllDivisions()
 		if err != nil {
 			return err
@@ -30,7 +30,7 @@ func (s *Server) GetDivisions(w http.ResponseWriter, r *http.Request) error {
 		}
 	}
 
-	return marshalAndWrite(divisions, w)
+	return marshalAndWrite(divisions, w, r)
 }
 
 func (s *Server) GetDivision(w http.ResponseWriter, r *http.Request) error {
@@ -52,7 +52,7 @@ func (s *Server) GetDivision(w http.ResponseWriter, r *http.Request) error {
 		l.Warn("couldn't fetch division: %v", err)
 	}
 	if div != nil {
-		return marshalAndWrite(div, w)
+		return marshalAndWrite(div, w, r)
 	}
 
 	if len(id) == 0 {
@@ -68,5 +68,5 @@ func (s *Server) GetDivision(w http.ResponseWriter, r *http.Request) error {
 	if err = s.dataStore.PutDivision(div); err != nil {
 		return err
 	}
-	return marshalAndWrite(div, w)
+	return marshalAndWrite(div, w, r)
 }

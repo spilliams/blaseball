@@ -1,4 +1,4 @@
-package remotedata
+package officialdata
 
 import (
 	"encoding/json"
@@ -17,7 +17,7 @@ func (b *BlaseballAPI) GetPlayersByID(ids []string) ([]*model.Player, error) {
 	bodies := make([][]byte, 0, len(chunkedIDs))
 	b.Debugf("calling in %d separate chunks of size %d", len(chunkedIDs), chunkSize)
 	for _, chunk := range chunkedIDs {
-		resp, err := b.Get("players", map[string][]string{"ids": {strings.Join(chunk, ",")}})
+		resp, err := b.get("players", map[string][]string{"ids": {strings.Join(chunk, ",")}})
 		if err != nil {
 			return nil, err
 		}

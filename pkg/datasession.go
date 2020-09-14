@@ -1,17 +1,12 @@
 package pkg
 
 import (
-	"net/url"
-
-	"github.com/go-resty/resty/v2"
 	"github.com/spilliams/blaseball/pkg/model"
 )
 
-// RemoteDataSession represents a data session with a remote source. This is
-// intended to be 1:1 api-compatible with the official Blaseball API.
-type RemoteDataSession interface {
-	Get(string, url.Values) (*resty.Response, error)
-
+// OfficialDataSession represents a data session with the official Blaseball
+// API (https://www.blaseball.com/database/).
+type OfficialDataSession interface {
 	GetAllDivisions() ([]*model.Division, error)
 	GetDivisionByID(string) (*model.Division, error)
 

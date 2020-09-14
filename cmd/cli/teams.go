@@ -28,7 +28,7 @@ func newTeamsListCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			teams, err := api.GetAllTeams()
+			teams, err := api.GetAllTeams(forbiddenKnowledge)
 			if err != nil {
 				return err
 			}
@@ -50,11 +50,11 @@ func newTeamGetCmd() *cobra.Command {
 			}
 			var team *model.Team
 			if isGUID(args[0]) {
-				team, err = api.GetTeamByID(args[0])
+				team, err = api.GetTeamByID(args[0], forbiddenKnowledge)
 			} else {
-				team, err = api.GetTeamByFullName(args[0])
+				team, err = api.GetTeamByFullName(args[0], forbiddenKnowledge)
 				if err != nil {
-					team, err = api.GetTeamByNickname(args[0])
+					team, err = api.GetTeamByNickname(args[0], forbiddenKnowledge)
 				}
 			}
 			if err != nil {

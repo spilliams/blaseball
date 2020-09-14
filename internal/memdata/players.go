@@ -9,15 +9,15 @@ import (
 	"github.com/spilliams/blaseball/pkg/model"
 )
 
-func (mds *MemoryDataStore) GetAllPlayers() ([]*model.Player, error) {
+func (mds *MemoryDataStore) GetAllPlayers() (*model.PlayerList, error) {
 	players := make([]*model.Player, 0, len(mds.allPlayers))
 	for _, p := range mds.allPlayers {
 		players = append(players, p)
 	}
-	return players, nil
+	return &model.PlayerList{players}, nil
 }
 
-func (mds *MemoryDataStore) GetPlayersByID(ids []string) ([]*model.Player, error) {
+func (mds *MemoryDataStore) GetPlayersByID(ids []string) (*model.PlayerList, error) {
 	players := make([]*model.Player, 0, len(ids))
 	for _, id := range ids {
 		player, ok := mds.allPlayers[id]
@@ -29,7 +29,7 @@ func (mds *MemoryDataStore) GetPlayersByID(ids []string) ([]*model.Player, error
 	if len(players) == 0 {
 		return nil, pkg.NewCodedError(fmt.Errorf("no players found with ids %v", ids), http.StatusNotFound)
 	}
-	return players, nil
+	return &model.PlayerList{players}, nil
 }
 
 func (mds *MemoryDataStore) GetPlayerByID(id string) (*model.Player, error) {

@@ -1,4 +1,4 @@
-package remotedata
+package officialdata
 
 import (
 	"encoding/json"
@@ -8,7 +8,7 @@ import (
 )
 
 func (b *BlaseballAPI) GetAllTeams() ([]*model.Team, error) {
-	resp, err := b.Get("allTeams", nil)
+	resp, err := b.get("allTeams", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -21,7 +21,7 @@ func (b *BlaseballAPI) GetAllTeams() ([]*model.Team, error) {
 }
 
 func (b *BlaseballAPI) GetTeamByID(id string) (*model.Team, error) {
-	resp, err := b.Get("team", map[string][]string{"id": {id}})
+	resp, err := b.get("team", map[string][]string{"id": {id}})
 	if err != nil {
 		return nil, err
 	}

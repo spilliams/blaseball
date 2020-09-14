@@ -28,7 +28,7 @@ func newPlayersListCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			players, err := api.GetAllPlayers()
+			players, err := api.GetAllPlayers(forbiddenKnowledge)
 			if err != nil {
 				return err
 			}
@@ -50,13 +50,13 @@ func newPlayerGetCmd() *cobra.Command {
 			}
 			var player *model.Player
 			if isGUID(args[0]) {
-				var players []*model.Player
-				players, err = api.GetPlayersByID([]string{args[0]})
-				if players != nil && len(players) > 0 {
-					player = players[0]
+				var players *model.PlayerList
+				players, err = api.GetPlayersByID([]string{args[0]}, forbiddenKnowledge)
+				if players != nil && len(players.List) > 0 {
+					player = players.List[0]
 				}
 			} else {
-				player, err = api.GetPlayerByName(args[0])
+				player, err = api.GetPlayerByName(args[0], forbiddenKnowledge)
 			}
 			if err != nil {
 				return err

@@ -14,8 +14,8 @@ func (s *Server) GetAllPlayers(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	incompletePlayerIDs := make([]string, 0, len(players))
-	for _, p := range players {
+	incompletePlayerIDs := make([]string, 0, len(players.List))
+	for _, p := range players.List {
 		if p.Incomplete() {
 			incompletePlayerIDs = append(incompletePlayerIDs, p.ID)
 		}
@@ -34,7 +34,7 @@ func (s *Server) GetAllPlayers(w http.ResponseWriter, r *http.Request) error {
 		}
 	}
 
-	return marshalAndWrite(players, w)
+	return marshalAndWrite(players, w, r)
 }
 
 func (s *Server) GetPlayers(w http.ResponseWriter, r *http.Request) error {
@@ -56,7 +56,7 @@ func (s *Server) GetPlayers(w http.ResponseWriter, r *http.Request) error {
 		return pkg.NewCodedError(fmt.Errorf("no Player found with name '%s'. Try looking them up by ID?", name), http.StatusNotFound)
 	}
 
-	return marshalAndWrite([]*model.Player{player}, w)
+	return marshalAndWrite(&model.PlayerList{List: []*model.Player{player}}, w, r)
 }
 
 func (s *Server) getPlayersByID(ids []string, w http.ResponseWriter, r *http.Request) error {
@@ -69,7 +69,7 @@ func (s *Server) getPlayersByID(ids []string, w http.ResponseWriter, r *http.Req
 		l.Warnf("couldn't fetch players by id: %v", err)
 		incompletePlayerIDs = append(incompletePlayerIDs, ids...)
 	} else {
-		for _, p := range players {
+		for _, p := range players.List {
 			if p.Incomplete() {
 				incompletePlayerIDs = append(incompletePlayerIDs, p.ID)
 			}
@@ -90,5 +90,5 @@ func (s *Server) getPlayersByID(ids []string, w http.ResponseWriter, r *http.Req
 		}
 	}
 
-	return marshalAndWrite(players, w)
+	return marshalAndWrite(players, w, r)
 }

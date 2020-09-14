@@ -9,12 +9,12 @@ import (
 	"github.com/spilliams/blaseball/pkg/model"
 )
 
-func (mds *MemoryDataStore) GetAllTeams() ([]*model.Team, error) {
+func (mds *MemoryDataStore) GetAllTeams() (*model.TeamList, error) {
 	teams := make([]*model.Team, 0, len(mds.allTeams))
 	for _, t := range mds.allTeams {
 		teams = append(teams, t)
 	}
-	return teams, nil
+	return &model.TeamList{teams}, nil
 }
 
 func (mds *MemoryDataStore) GetTeamByID(id string) (*model.Team, error) {

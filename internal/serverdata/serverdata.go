@@ -1,44 +1,38 @@
-package remotedata
+package serverdata
 
 import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"path"
 	"strings"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/sirupsen/logrus"
+	"github.com/spilliams/blaseball/internal"
 	"github.com/spilliams/blaseball/pkg"
 )
 
-// BlaseballAPI represents an HTTP request interface for interacting with a
-// blaseball-centric JSON API
 type BlaseballAPI struct {
-	blaseURL  string
-	blasePath string
-	client    *resty.Client
+	blaseURL string
+	client   *resty.Client
 	*logrus.Logger
 }
 
-// NewAPI returns a new API client. If given blaseURL is empty, the official
-// one will be used (https://www.blaseball.com/database/).
-func NewAPI(blaseURL string, blasePath string, logLevel logrus.Level) pkg.RemoteDataSession {
+// TODO: DRY this somehow with pkg.officialdata?
+func NewAPI(blaseURL string, logLevel logrus.Level) internal.ServerDataSession {
 	if len(blaseURL) == 0 {
-		blaseURL = "https://www.blaseball.com/"
-		blasePath = "database"
+		blaseURL = "http://localhost:8080/"
 	}
 	l := logrus.StandardLogger()
 	l.SetLevel(logLevel)
 	return &BlaseballAPI{
-		blaseURL:  blaseURL,
-		blasePath: blasePath,
-		client:    resty.New().SetHeader("User-Agent", "github.com/spilliams/blaseball"),
-		Logger:    l,
+		blaseURL: blaseURL,
+		client:   resty.New().SetHeader("User-Agent", "github.com/spilliams/blaseball"),
+		Logger:   l,
 	}
 }
 
-func (b *BlaseballAPI) Get(path string, queryParams url.Values) (*resty.Response, error) {
+func (b *BlaseballAPI) get(path string, queryParams url.Values) (*resty.Response, error) {
 	return b.call(http.MethodGet, path, queryParams)
 }
 
@@ -75,14 +69,25 @@ func (b *BlaseballAPI) call(method, path string, queryParams url.Values) (*resty
 	return resp, nil
 }
 
-func (b *BlaseballAPI) buildURL(finalPath string, queryParams url.Values) (string, error) {
+func (b *BlaseballAPI) buildURL(path string, queryParams url.Values) (string, error) {
 	build, err := url.Parse(b.blaseURL)
 	if err != nil {
 		return "", err
 	}
-	build.Path = path.Join(b.blasePath, finalPath)
+	build.Path = path
 	if queryParams != nil {
 		build.RawQuery = queryParams.Encode()
 	}
 	return build.String(), nil
+}
+
+func addShowFKQuery(q map[string][]string, showFK bool) map[string][]string {
+	if !showFK {
+		return q
+	}
+	if q == nil {
+		q = make(map[string][]string)
+	}
+	q["showForbiddenKnowledge"] = []string{"true"}
+	return q
 }
