@@ -16,7 +16,7 @@ func main() {
 		port = "8080"
 	}
 
-	local := memdata.NewSession()
+	local := memdata.NewStore()
 	remote := officialdata.NewAPI("https://www.blaseball.com", "database", logrus.DebugLevel)
 	s := apiserver.NewServer(local, remote)
 	err := s.StartHTTPServer(port)

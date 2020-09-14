@@ -12,9 +12,10 @@ import (
 func (mds *MemoryDataStore) GetAllPlayers() (*model.PlayerList, error) {
 	players := make([]*model.Player, 0, len(mds.allPlayers))
 	for _, p := range mds.allPlayers {
-		players = append(players, p)
+		copy := *p
+		players = append(players, &copy)
 	}
-	return &model.PlayerList{players}, nil
+	return &model.PlayerList{List: players}, nil
 }
 
 func (mds *MemoryDataStore) GetPlayersByID(ids []string) (*model.PlayerList, error) {
@@ -24,12 +25,13 @@ func (mds *MemoryDataStore) GetPlayersByID(ids []string) (*model.PlayerList, err
 		if !ok {
 			continue
 		}
-		players = append(players, player)
+		copy := *player
+		players = append(players, &copy)
 	}
 	if len(players) == 0 {
 		return nil, pkg.NewCodedError(fmt.Errorf("no players found with ids %v", ids), http.StatusNotFound)
 	}
-	return &model.PlayerList{players}, nil
+	return &model.PlayerList{List: players}, nil
 }
 
 func (mds *MemoryDataStore) GetPlayerByID(id string) (*model.Player, error) {
@@ -37,13 +39,15 @@ func (mds *MemoryDataStore) GetPlayerByID(id string) (*model.Player, error) {
 	if !ok {
 		return nil, pkg.NewCodedError(fmt.Errorf("no Player with id %s", id), http.StatusNotFound)
 	}
-	return player, nil
+	copy := *player
+	return &copy, nil
 }
 
 func (mds *MemoryDataStore) GetPlayerByName(name string) (*model.Player, error) {
 	for _, p := range mds.allPlayers {
 		if strings.EqualFold(p.Name, name) {
-			return p, nil
+			copy := *p
+			return &copy, nil
 		}
 	}
 	return nil, pkg.NewCodedError(fmt.Errorf("no player with name %s", name), http.StatusNotFound)

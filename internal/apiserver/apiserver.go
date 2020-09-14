@@ -99,7 +99,6 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func marshalAndWrite(obj interface{}, w http.ResponseWriter, r *http.Request) error {
-	// TODO: showing forbidden works, but stuff stays shown...
 	showFK := showForbiddenKnowledge(r)
 	if showFK {
 		objFK, ok := obj.(model.Unforbiddable)
@@ -110,7 +109,6 @@ func marshalAndWrite(obj interface{}, w http.ResponseWriter, r *http.Request) er
 			objFK.Unforbid()
 		}
 	}
-	// TODO: is obj unforbidden now? or just objFK?
 	bytes, err := json.Marshal(obj)
 	if err != nil {
 		return fmt.Errorf("could not marshal response: %v", err)

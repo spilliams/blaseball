@@ -47,7 +47,7 @@ a database.
 it? how many of the following do I need:
     - [ ] database data store
     - [x] server is smart about freshness-checking
-    - [ ] server is smart about Forbidden Knowledge
+    - [x] server is smart about Forbidden Knowledge
     - [ ] server is API-complete, Objects edition
         - [ ] leagues
         - [ ] subleagues

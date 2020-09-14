@@ -12,9 +12,10 @@ import (
 func (mds *MemoryDataStore) GetAllDivisions() (*model.DivisionList, error) {
 	divisions := make([]*model.Division, 0, len(mds.allDivisions))
 	for _, d := range mds.allDivisions {
-		divisions = append(divisions, d)
+		copy := *d
+		divisions = append(divisions, &copy)
 	}
-	return &model.DivisionList{divisions}, nil
+	return &model.DivisionList{List: divisions}, nil
 }
 
 func (mds *MemoryDataStore) GetDivisionByID(id string) (*model.Division, error) {
@@ -22,13 +23,15 @@ func (mds *MemoryDataStore) GetDivisionByID(id string) (*model.Division, error) 
 	if !ok {
 		return nil, pkg.NewCodedError(fmt.Errorf("no Division with id %s", id), http.StatusNotFound)
 	}
-	return division, nil
+	copy := *division
+	return &copy, nil
 }
 
 func (mds *MemoryDataStore) GetDivisionByName(name string) (*model.Division, error) {
 	for _, d := range mds.allDivisions {
 		if strings.EqualFold(d.Name, name) {
-			return d, nil
+			copy := *d
+			return &copy, nil
 		}
 	}
 	return nil, pkg.NewCodedError(fmt.Errorf("no Division with name %s", name), http.StatusNotFound)

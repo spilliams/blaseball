@@ -12,8 +12,8 @@ type MemoryDataStore struct {
 	allPlayers   map[string]*model.Player
 }
 
-// NewSession returns a new, empty in-memory data session
-func NewSession() internal.DataStorageSession {
+// NewStore returns a new, empty in-memory data session
+func NewStore() internal.DataStorageSession {
 	return &MemoryDataStore{
 		allDivisions: map[string]*model.Division{},
 		allTeams:     map[string]*model.Team{},

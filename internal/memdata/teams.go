@@ -12,9 +12,10 @@ import (
 func (mds *MemoryDataStore) GetAllTeams() (*model.TeamList, error) {
 	teams := make([]*model.Team, 0, len(mds.allTeams))
 	for _, t := range mds.allTeams {
-		teams = append(teams, t)
+		copy := *t
+		teams = append(teams, &copy)
 	}
-	return &model.TeamList{teams}, nil
+	return &model.TeamList{List: teams}, nil
 }
 
 func (mds *MemoryDataStore) GetTeamByID(id string) (*model.Team, error) {
@@ -22,13 +23,15 @@ func (mds *MemoryDataStore) GetTeamByID(id string) (*model.Team, error) {
 	if !ok {
 		return nil, pkg.NewCodedError(fmt.Errorf("no team with id %s", id), http.StatusNotFound)
 	}
-	return team, nil
+	copy := *team
+	return &copy, nil
 }
 
 func (mds *MemoryDataStore) GetTeamByFullName(name string) (*model.Team, error) {
 	for _, t := range mds.allTeams {
 		if strings.EqualFold(t.FullName, name) {
-			return t, nil
+			copy := *t
+			return &copy, nil
 		}
 	}
 	return nil, pkg.NewCodedError(fmt.Errorf("no team with name %s", name), http.StatusNotFound)
@@ -37,7 +40,8 @@ func (mds *MemoryDataStore) GetTeamByFullName(name string) (*model.Team, error) 
 func (mds *MemoryDataStore) GetTeamByNickname(name string) (*model.Team, error) {
 	for _, t := range mds.allTeams {
 		if strings.EqualFold(t.Nickname, name) {
-			return t, nil
+			copy := *t
+			return &copy, nil
 		}
 	}
 	return nil, pkg.NewCodedError(fmt.Errorf("no team with name %s", name), http.StatusNotFound)
