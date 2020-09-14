@@ -16,16 +16,16 @@ import (
 
 // Server represents a web server that can handle requests about blaseball.
 type Server struct {
-	dataSession internal.LocalDataSession
-	remoteAPI   pkg.RemoteDataSession
+	dataStore internal.LocalDataSession
+	remoteAPI pkg.RemoteDataSession
 }
 
 // NewServer returns a new server with the given local data session (for
 // storing) and remote data session (for fetching)
 func NewServer(local internal.LocalDataSession, remote pkg.RemoteDataSession) *Server {
 	return &Server{
-		dataSession: local,
-		remoteAPI:   remote,
+		dataStore: local,
+		remoteAPI: remote,
 	}
 }
 

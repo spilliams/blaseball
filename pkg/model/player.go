@@ -50,8 +50,8 @@ type Player struct {
 	Blood          int
 	Fate           int
 
-	WeekAttributes      []string `json:"weekAttr"`
-	GameAttributes      []string `json:"gameAttr"`
-	SeasonAttributes    []string `json:"seasAttr"`
-	PermanentAttributes []string `json:"permAttr"`
+}
+
+func (p *Player) Incomplete() bool {
+	return len(p.Name) == 0
 }

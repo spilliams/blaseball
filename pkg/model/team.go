@@ -37,3 +37,7 @@ type Team struct {
 func (t *Team) String() string {
 	return fmt.Sprintf("<T %s>", t.FullName)
 }
+
+func (t *Team) Incomplete() bool {
+	return len(t.FullName) == 0
+}

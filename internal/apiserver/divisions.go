@@ -9,23 +9,22 @@ import (
 )
 
 func (s *Server) GetDivisions(w http.ResponseWriter, r *http.Request) error {
-	divisions, err := s.dataSession.GetAllDivisions()
+	divisions, err := s.dataStore.GetAllDivisions()
 	if err != nil {
 		return err
 	}
 
 	if len(divisions) == 0 {
-		// TODO or if divisions are stale?
 		remoteDivisions, err := s.remoteAPI.GetAllDivisions()
 		if err != nil {
 			return err
 		}
 		for _, d := range remoteDivisions {
-			if err := s.dataSession.PutDivision(d); err != nil {
+			if err := s.dataStore.PutDivision(d); err != nil {
 				return err
 			}
 		}
-		divisions, err = s.dataSession.GetAllDivisions()
+		divisions, err = s.dataStore.GetAllDivisions()
 		if err != nil {
 			return err
 		}
@@ -44,9 +43,9 @@ func (s *Server) GetDivision(w http.ResponseWriter, r *http.Request) error {
 	var div *model.Division
 	var err error
 	if len(id) != 0 {
-		div, err = s.dataSession.GetDivisionByID(id)
+		div, err = s.dataStore.GetDivisionByID(id)
 	} else {
-		div, err = s.dataSession.GetDivisionByName(name)
+		div, err = s.dataStore.GetDivisionByName(name)
 	}
 	if err != nil {
 		l := loggerFromRequest(r)
@@ -66,7 +65,7 @@ func (s *Server) GetDivision(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	if err = s.dataSession.PutDivision(div); err != nil {
+	if err = s.dataStore.PutDivision(div); err != nil {
 		return err
 	}
 	return marshalAndWrite(div, w)

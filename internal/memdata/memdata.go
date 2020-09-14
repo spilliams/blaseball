@@ -9,8 +9,8 @@ import (
 	"github.com/spilliams/blaseball/pkg/model"
 )
 
-// MemoryDataSession represents an in-memory set of blaseball data
-type MemoryDataSession struct {
+// MemoryDataStore represents an in-memory set of blaseball data
+type MemoryDataStore struct {
 	allDivisions map[string]*model.Division
 	allTeams     map[string]*model.Team
 	allPlayers   map[string]*model.Player
@@ -18,13 +18,13 @@ type MemoryDataSession struct {
 
 // NewSession returns a new, empty in-memory data session
 func NewSession() internal.LocalDataSession {
-	return &MemoryDataSession{
+	return &MemoryDataStore{
 		allDivisions: map[string]*model.Division{},
 		allTeams:     map[string]*model.Team{},
 		allPlayers:   map[string]*model.Player{},
 	}
 }
 
-func (mds *MemoryDataSession) Get(path string, queryParams url.Values) (*resty.Response, error) {
+func (mds *MemoryDataStore) Get(path string, queryParams url.Values) (*resty.Response, error) {
 	return nil, fmt.Errorf("no-op")
 }

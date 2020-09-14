@@ -18,7 +18,7 @@ type BlaseballAPI struct {
 	blaseURL  string
 	blasePath string
 	client    *resty.Client
-	logger    *logrus.Logger
+	*logrus.Logger
 }
 
 // NewAPI returns a new API client. If given blaseURL is empty, the official
@@ -34,7 +34,7 @@ func NewAPI(blaseURL string, blasePath string, logLevel logrus.Level) pkg.Remote
 		blaseURL:  blaseURL,
 		blasePath: blasePath,
 		client:    resty.New().SetHeader("User-Agent", "github.com/spilliams/blaseball"),
-		logger:    l,
+		Logger:    l,
 	}
 }
 
@@ -48,15 +48,15 @@ func (b *BlaseballAPI) call(method, path string, queryParams url.Values) (*resty
 		return nil, err
 	}
 
-	b.logger.Debugf("Calling url %s", fullURL)
+	b.Tracef("Calling url %s", fullURL)
 	resp, err := b.client.R().Execute(method, fullURL)
 	if err != nil {
 		e := fmt.Errorf("could not send request to server: %v", err)
 		return nil, pkg.NewCodedError(e, http.StatusInternalServerError)
 	}
 
-	b.logger.Debugf("Request: %v", resp.Request)
-	b.logger.Debugf("Response %d: %s", resp.StatusCode(), resp)
+	b.Tracef("Request: %v", resp.Request)
+	b.Tracef("Response %d: %s", resp.StatusCode(), resp)
 
 	msg := resp.String()
 	// special cases for blaseball official API!
