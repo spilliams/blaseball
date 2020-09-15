@@ -73,3 +73,8 @@ it? how many of the following do I need:
         - [x] player
     - [ ] CLI is API-complete, for some subset of the server API
     - [ ] server is configured and running on a host somewhere
+    - [ ] tasks to fetch current season, game
+    - [ ] refactor server endpoints to be more restful
+    - [ ] publish openAPI spec (for mine or both?)
+    - [ ] health metrics for my services
+    - [ ] canary for when the official api changes
