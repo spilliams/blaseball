@@ -1,14 +1,13 @@
 package apiserver
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/spilliams/blaseball/pkg"
 	"github.com/spilliams/blaseball/pkg/model"
 )
 
-func (s *Server) GetDivisions(w http.ResponseWriter, r *http.Request) error {
+func (s *Server) GetAllDivisions(w http.ResponseWriter, r *http.Request) error {
 	divisions, err := s.dataStore.GetAllDivisions()
 	if err != nil {
 		return err
@@ -37,7 +36,7 @@ func (s *Server) GetDivision(w http.ResponseWriter, r *http.Request) error {
 	id := getQueryString(r, "id")
 	name := getQueryString(r, "name")
 	if len(id) == 0 && len(name) == 0 {
-		return pkg.NewCodedError(fmt.Errorf("either `id` or `name` must be specified in query parameters"), http.StatusBadRequest)
+		return pkg.NewCodedErrorf(http.StatusBadRequest, "either `id` or `name` must be specified in query parameters")
 	}
 
 	var div *model.Division
@@ -49,7 +48,7 @@ func (s *Server) GetDivision(w http.ResponseWriter, r *http.Request) error {
 	}
 	if err != nil {
 		l := loggerFromRequest(r)
-		l.Warn("couldn't fetch division: %v", err)
+		l.Warnf("couldn't fetch division: %v", err)
 	}
 	if div != nil {
 		return marshalAndWrite(div, w, r)
@@ -57,7 +56,7 @@ func (s *Server) GetDivision(w http.ResponseWriter, r *http.Request) error {
 
 	if len(id) == 0 {
 		// user asked for it without ID, but we have no such ID in data
-		return pkg.NewCodedError(fmt.Errorf("no Division found with name '%s'. Try looking it up by ID?", name), http.StatusNotFound)
+		return pkg.NewCodedErrorf(http.StatusNotFound, "no Division found with name '%s'. Try looking it up by ID?", name)
 	}
 
 	// last resort: fetch from remote

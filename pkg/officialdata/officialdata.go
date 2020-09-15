@@ -52,7 +52,7 @@ func (b *BlaseballAPI) call(method, path string, queryParams url.Values) (*resty
 	resp, err := b.client.R().Execute(method, fullURL)
 	if err != nil {
 		e := fmt.Errorf("could not send request to server: %v", err)
-		return nil, pkg.NewCodedError(e, http.StatusInternalServerError)
+		return nil, pkg.NewCodedError(http.StatusInternalServerError, e)
 	}
 
 	b.Tracef("Request: %v", resp.Request)
@@ -63,13 +63,13 @@ func (b *BlaseballAPI) call(method, path string, queryParams url.Values) (*resty
 	if strings.Index(msg, "<title>Offline for Maintenance</title>") > -1 {
 		msg = "Offline for Maintenance"
 	} else if strings.Index(msg, "<!doctype html>") > -1 {
-		return nil, pkg.NewCodedError(fmt.Errorf("URL %s leads to an html page, not JSON data. Are you querying the base API you mean to be?", fullURL), http.StatusNotAcceptable)
+		return nil, pkg.NewCodedErrorf(http.StatusNotAcceptable, "URL %s leads to an html page, not JSON data. Are you querying the base API you mean to be?", fullURL)
 	}
 
 	// check the status code
 	if resp.StatusCode() >= 300 {
 		e := fmt.Errorf("server responded with status code %d: %s", resp.StatusCode(), msg)
-		return nil, pkg.NewCodedError(e, resp.StatusCode())
+		return nil, pkg.NewCodedError(resp.StatusCode(), e)
 	}
 
 	return resp, nil
@@ -85,4 +85,29 @@ func (b *BlaseballAPI) buildURL(finalPath string, queryParams url.Values) (strin
 		build.RawQuery = queryParams.Encode()
 	}
 	return build.String(), nil
+}
+
+// Asking for /players?ids=... with 272+ ids will return a 414 URI Too Long.
+// Asking for 200-271 ids will return a 431 Request Header Fields Too Large.
+const chunkSize = 199
+
+func chunk(items []string, chunkSize int) (chunks [][]string) {
+	for chunkSize < len(items) {
+		items, chunks = items[chunkSize:], append(chunks, items[0:chunkSize:chunkSize])
+	}
+	return append(chunks, items)
+}
+
+func (b *BlaseballAPI) getAll(path string, queryKey string, queryValues []string) ([][]byte, error) {
+	chunkedValues := chunk(queryValues, chunkSize)
+	bodies := make([][]byte, 0, len(chunkedValues))
+	b.Debugf("calling in %d separate chunks of size %d", len(chunkedValues), chunkSize)
+	for _, chunk := range chunkedValues {
+		resp, err := b.get(path, map[string][]string{queryKey: {strings.Join(chunk, ",")}})
+		if err != nil {
+			return nil, err
+		}
+		bodies = append(bodies, resp.Body())
+	}
+	return bodies, nil
 }

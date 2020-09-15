@@ -1,14 +1,13 @@
 package apiserver
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/spilliams/blaseball/pkg"
 	"github.com/spilliams/blaseball/pkg/model"
 )
 
-func (s *Server) GetTeams(w http.ResponseWriter, r *http.Request) error {
+func (s *Server) GetAllTeams(w http.ResponseWriter, r *http.Request) error {
 	teams, err := s.dataStore.GetAllTeams()
 	if err != nil {
 		return err
@@ -42,7 +41,7 @@ func (s *Server) GetTeam(w http.ResponseWriter, r *http.Request) error {
 	fullname := getQueryString(r, "fullname")
 	nickname := getQueryString(r, "nickname")
 	if len(id) == 0 && len(fullname) == 0 && len(nickname) == 0 {
-		return pkg.NewCodedError(fmt.Errorf("either `id`, `fullname` or `nickname` must be specified in query parameters"), http.StatusBadRequest)
+		return pkg.NewCodedErrorf(http.StatusBadRequest, "either `id`, `fullname` or `nickname` must be specified in query parameters")
 	}
 
 	var team *model.Team
@@ -59,11 +58,11 @@ func (s *Server) GetTeam(w http.ResponseWriter, r *http.Request) error {
 
 	if err != nil {
 		l := loggerFromRequest(r)
-		l.Warn("couldn't fetch team by name: %v", err)
+		l.Warnf("couldn't fetch team by name: %v", err)
 	}
 
 	if team == nil {
-		return pkg.NewCodedError(fmt.Errorf("no Team found with %s '%s'. Try looking it up by ID?", paramName, paramValue), http.StatusNotFound)
+		return pkg.NewCodedErrorf(http.StatusNotFound, "no Team found with %s '%s'. Try looking it up by ID?", paramName, paramValue)
 	}
 
 	return marshalAndWrite(team, w, r)
@@ -74,7 +73,7 @@ func (s *Server) getTeamByID(id string, w http.ResponseWriter, r *http.Request) 
 	fetchFromRemote := err != nil || team == nil || team.Incomplete()
 	if err != nil {
 		l := loggerFromRequest(r)
-		l.Warn("couldn't fetch team by id: %v", err)
+		l.Warnf("couldn't fetch team by id: %v", err)
 	}
 	if !fetchFromRemote {
 		return marshalAndWrite(team, w, r)
@@ -83,6 +82,9 @@ func (s *Server) getTeamByID(id string, w http.ResponseWriter, r *http.Request) 
 	team, err = s.remoteAPI.GetTeamByID(id)
 	if err != nil {
 		return err
+	}
+	if team == nil {
+		return pkg.NewCodedErrorf(http.StatusNotFound, "no Team found with id '%s'", id)
 	}
 	if err = s.dataStore.PutTeam(team); err != nil {
 		return err

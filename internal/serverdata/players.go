@@ -2,7 +2,6 @@ package serverdata
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -17,11 +16,8 @@ func (b *BlaseballAPI) GetAllPlayers(showFK bool) (*model.PlayerList, error) {
 		return nil, err
 	}
 	var players []*model.Player
-	if err = json.Unmarshal(resp.Body(), &players); err != nil {
-		return nil, fmt.Errorf("couldn't unmarshal response: %v", err)
-	}
-
-	return &model.PlayerList{players}, nil
+	err = json.Unmarshal(resp.Body(), &players)
+	return &model.PlayerList{players}, err
 }
 
 func (b *BlaseballAPI) GetPlayerByID(id string, showFK bool) (*model.Player, error) {
@@ -30,7 +26,7 @@ func (b *BlaseballAPI) GetPlayerByID(id string, showFK bool) (*model.Player, err
 		return nil, err
 	}
 	if players == nil || len(players.List) == 0 {
-		return nil, pkg.NewCodedError(fmt.Errorf("no Player with id %s", id), http.StatusNotFound)
+		return nil, pkg.NewCodedErrorf(http.StatusNotFound, "no Player with id %s", id)
 	}
 	return players.List[0], nil
 }
@@ -42,14 +38,11 @@ func (b *BlaseballAPI) GetPlayerByName(name string, showFK bool) (*model.Player,
 		return nil, err
 	}
 	var player *model.Player
-	if err = json.Unmarshal(resp.Body(), &player); err != nil {
-		return nil, fmt.Errorf("couldn't unmarshal response: %v", err)
-	}
-
-	return player, nil
+	err = json.Unmarshal(resp.Body(), &player)
+	return player, err
 }
 
-const chunkSize = 199
+const chunkSize = 190
 
 func (b *BlaseballAPI) GetPlayersByID(ids []string, showFK bool) (*model.PlayerList, error) {
 	chunkedIDs := chunk(ids, chunkSize)
@@ -68,7 +61,7 @@ func (b *BlaseballAPI) GetPlayersByID(ids []string, showFK bool) (*model.PlayerL
 	for _, body := range bodies {
 		var respPlayers []*model.Player
 		if err := json.Unmarshal(body, &respPlayers); err != nil {
-			return nil, fmt.Errorf("couldn't unmarshal response: %v", err)
+			return nil, err
 		}
 		players = append(players, respPlayers...)
 	}

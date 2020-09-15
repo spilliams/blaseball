@@ -1,5 +1,7 @@
 package pkg
 
+import "fmt"
+
 // Coded represents an error that can be asked for its status code.
 type Coded interface {
 	error
@@ -13,9 +15,17 @@ type CodedError struct {
 }
 
 // NewCodedError returns a new error with status code
-func NewCodedError(e error, c int) CodedError {
+func NewCodedError(c int, e error) CodedError {
 	return CodedError{
 		err:  e,
+		code: c,
+	}
+}
+
+// NewCodedErrorf returns a new error with status code
+func NewCodedErrorf(c int, format string, parts ...interface{}) CodedError {
+	return CodedError{
+		err:  fmt.Errorf(format, parts...),
 		code: c,
 	}
 }

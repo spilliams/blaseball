@@ -2,7 +2,6 @@ package serverdata
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/spilliams/blaseball/pkg/model"
@@ -15,11 +14,8 @@ func (b *BlaseballAPI) GetAllDivisions(showFK bool) (*model.DivisionList, error)
 		return nil, err
 	}
 	var divisions []*model.Division
-	if err = json.Unmarshal(resp.Body(), &divisions); err != nil {
-		return nil, fmt.Errorf("couldn't unmarshal response: %v", err)
-	}
-
-	return &model.DivisionList{divisions}, nil
+	err = json.Unmarshal(resp.Body(), &divisions)
+	return &model.DivisionList{divisions}, err
 }
 
 func (b *BlaseballAPI) GetDivisionByID(id string, showFK bool) (*model.Division, error) {

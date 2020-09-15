@@ -1,7 +1,6 @@
 package apiserver
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/spilliams/blaseball/pkg"
@@ -20,18 +19,22 @@ func (s *Server) GetAllPlayers(w http.ResponseWriter, r *http.Request) error {
 			incompletePlayerIDs = append(incompletePlayerIDs, p.ID)
 		}
 	}
-	if len(incompletePlayerIDs) > 0 {
-		l := loggerFromRequest(r)
-		l.Infof("fetching %d complete player records", len(incompletePlayerIDs))
-		completePlayers, err := s.remoteAPI.GetPlayersByID(incompletePlayerIDs)
-		if err != nil {
-			return err
-		}
-		s.dataStore.PutPlayers(completePlayers)
-		players, err = s.dataStore.GetAllPlayers()
-		if err != nil {
-			return err
-		}
+	if len(incompletePlayerIDs) == 0 {
+		return marshalAndWrite(players, w, r)
+	}
+
+	l := loggerFromRequest(r)
+	l.Infof("fetching %d complete player records", len(incompletePlayerIDs))
+	completePlayers, err := s.remoteAPI.GetPlayersByID(incompletePlayerIDs)
+	if err != nil {
+		return err
+	}
+	if err := s.dataStore.PutPlayers(completePlayers); err != nil {
+		return err
+	}
+	players, err = s.dataStore.GetAllPlayers()
+	if err != nil {
+		return err
 	}
 
 	return marshalAndWrite(players, w, r)
@@ -44,7 +47,7 @@ func (s *Server) GetPlayers(w http.ResponseWriter, r *http.Request) error {
 		return s.getPlayersByID(ids, w, r)
 	}
 	if len(name) == 0 {
-		return pkg.NewCodedError(fmt.Errorf("either `ids` or `name` must be specified in query parameters"), http.StatusBadRequest)
+		return pkg.NewCodedErrorf(http.StatusBadRequest, "either `ids` or `name` must be specified in query parameters")
 	}
 
 	player, err := s.dataStore.GetPlayerByName(name)
@@ -53,7 +56,7 @@ func (s *Server) GetPlayers(w http.ResponseWriter, r *http.Request) error {
 		l.Warnf("couldn't fetch player by name: %v", err)
 	}
 	if player == nil {
-		return pkg.NewCodedError(fmt.Errorf("no Player found with name '%s'. Try looking them up by ID?", name), http.StatusNotFound)
+		return pkg.NewCodedErrorf(http.StatusNotFound, "no Player found with name '%s'. Try looking them up by ID?", name)
 	}
 
 	return marshalAndWrite(&model.PlayerList{List: []*model.Player{player}}, w, r)

@@ -1,7 +1,6 @@
 package memdata
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -10,8 +9,8 @@ import (
 )
 
 func (mds *MemoryDataStore) GetAllTeams() (*model.TeamList, error) {
-	teams := make([]*model.Team, 0, len(mds.allTeams))
-	for _, t := range mds.allTeams {
+	teams := make([]*model.Team, 0, len(mds.teams))
+	for _, t := range mds.teams {
 		copy := *t
 		teams = append(teams, &copy)
 	}
@@ -19,48 +18,52 @@ func (mds *MemoryDataStore) GetAllTeams() (*model.TeamList, error) {
 }
 
 func (mds *MemoryDataStore) GetTeamByID(id string) (*model.Team, error) {
-	team, ok := mds.allTeams[id]
+	team, ok := mds.teams[id]
 	if !ok {
-		return nil, pkg.NewCodedError(fmt.Errorf("no team with id %s", id), http.StatusNotFound)
+		return nil, pkg.NewCodedErrorf(http.StatusNotFound, "no team with id %s", id)
 	}
 	copy := *team
 	return &copy, nil
 }
 
 func (mds *MemoryDataStore) GetTeamByFullName(name string) (*model.Team, error) {
-	for _, t := range mds.allTeams {
+	for _, t := range mds.teams {
 		if strings.EqualFold(t.FullName, name) {
 			copy := *t
 			return &copy, nil
 		}
 	}
-	return nil, pkg.NewCodedError(fmt.Errorf("no team with name %s", name), http.StatusNotFound)
+	return nil, pkg.NewCodedErrorf(http.StatusNotFound, "no team with name %s", name)
 }
 
 func (mds *MemoryDataStore) GetTeamByNickname(name string) (*model.Team, error) {
-	for _, t := range mds.allTeams {
+	for _, t := range mds.teams {
 		if strings.EqualFold(t.Nickname, name) {
 			copy := *t
 			return &copy, nil
 		}
 	}
-	return nil, pkg.NewCodedError(fmt.Errorf("no team with name %s", name), http.StatusNotFound)
+	return nil, pkg.NewCodedErrorf(http.StatusNotFound, "no team with name %s", name)
 }
 
 func (mds *MemoryDataStore) PutTeam(team *model.Team) error {
-	mds.allTeams[team.ID] = team
-	mds.seedPlayers(team.Lineup)
-	mds.seedPlayers(team.Rotation)
-	mds.seedPlayers(team.Bench)
-	mds.seedPlayers(team.Bullpen)
-	return nil
+	mds.teams[team.ID] = team
+	playerLists := [][]string{team.Lineup, team.Rotation, team.Bench, team.Bullpen}
+	players := make([]string, 0, len(team.Lineup)+len(team.Rotation)+len(team.Bench)+len(team.Bullpen))
+	for _, list := range playerLists {
+		players = append(players, list...)
+	}
+	return mds.seedPlayers(players)
 }
 
-func (mds *MemoryDataStore) seedTeams(ids []string) {
+func (mds *MemoryDataStore) seedTeams(ids []string) error {
 	for _, id := range ids {
-		_, ok := mds.allTeams[id]
+		_, ok := mds.teams[id]
 		if !ok {
-			mds.PutTeam(&model.Team{ID: id})
+			if err := mds.PutTeam(&model.Team{ID: id}); err != nil {
+				return err
+			}
 		}
 	}
+	return nil
 }

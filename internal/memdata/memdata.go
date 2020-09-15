@@ -7,16 +7,24 @@ import (
 
 // MemoryDataStore represents an in-memory set of blaseball data
 type MemoryDataStore struct {
-	allDivisions map[string]*model.Division
-	allTeams     map[string]*model.Team
-	allPlayers   map[string]*model.Player
+	divisions              map[string]*model.Division
+	gameStatsheets         map[string]*model.GameStatsheet
+	players                map[string]*model.Player
+	playerSeasonStatsheets map[string]*model.PlayerSeasonStatsheet
+	seasonStatsheets       map[string]*model.SeasonStatsheet
+	teams                  map[string]*model.Team
+	teamStatsheets         map[string]*model.TeamStatsheet
 }
 
 // NewStore returns a new, empty in-memory data session
 func NewStore() internal.DataStorageSession {
 	return &MemoryDataStore{
-		allDivisions: map[string]*model.Division{},
-		allTeams:     map[string]*model.Team{},
-		allPlayers:   map[string]*model.Player{},
+		divisions:              map[string]*model.Division{},
+		gameStatsheets:         map[string]*model.GameStatsheet{},
+		players:                map[string]*model.Player{},
+		playerSeasonStatsheets: map[string]*model.PlayerSeasonStatsheet{},
+		seasonStatsheets:       map[string]*model.SeasonStatsheet{},
+		teams:                  map[string]*model.Team{},
+		teamStatsheets:         map[string]*model.TeamStatsheet{},
 	}
 }

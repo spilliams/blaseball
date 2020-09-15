@@ -66,10 +66,10 @@ it? how many of the following do I need:
         - [ ] decrees
         - [ ] election details
         - [ ] election results
-    - [ ] API-completeness, Statsheets edition
-        - [ ] season
-        - [ ] game
-        - [ ] team
-        - [ ] player
+    - [x] API-completeness, Statsheets edition
+        - [x] season
+        - [x] game
+        - [x] team
+        - [x] player
     - [ ] CLI is API-complete, for some subset of the server API
     - [ ] server is configured and running on a host somewhere

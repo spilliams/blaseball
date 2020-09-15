@@ -1,7 +1,6 @@
 package memdata
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -10,8 +9,8 @@ import (
 )
 
 func (mds *MemoryDataStore) GetAllPlayers() (*model.PlayerList, error) {
-	players := make([]*model.Player, 0, len(mds.allPlayers))
-	for _, p := range mds.allPlayers {
+	players := make([]*model.Player, 0, len(mds.players))
+	for _, p := range mds.players {
 		copy := *p
 		players = append(players, &copy)
 	}
@@ -21,7 +20,7 @@ func (mds *MemoryDataStore) GetAllPlayers() (*model.PlayerList, error) {
 func (mds *MemoryDataStore) GetPlayersByID(ids []string) (*model.PlayerList, error) {
 	players := make([]*model.Player, 0, len(ids))
 	for _, id := range ids {
-		player, ok := mds.allPlayers[id]
+		player, ok := mds.players[id]
 		if !ok {
 			continue
 		}
@@ -29,32 +28,32 @@ func (mds *MemoryDataStore) GetPlayersByID(ids []string) (*model.PlayerList, err
 		players = append(players, &copy)
 	}
 	if len(players) == 0 {
-		return nil, pkg.NewCodedError(fmt.Errorf("no players found with ids %v", ids), http.StatusNotFound)
+		return nil, pkg.NewCodedErrorf(http.StatusNotFound, "no players found with ids %v", ids)
 	}
 	return &model.PlayerList{List: players}, nil
 }
 
 func (mds *MemoryDataStore) GetPlayerByID(id string) (*model.Player, error) {
-	player, ok := mds.allPlayers[id]
+	player, ok := mds.players[id]
 	if !ok {
-		return nil, pkg.NewCodedError(fmt.Errorf("no Player with id %s", id), http.StatusNotFound)
+		return nil, pkg.NewCodedErrorf(http.StatusNotFound, "no Player with id %s", id)
 	}
 	copy := *player
 	return &copy, nil
 }
 
 func (mds *MemoryDataStore) GetPlayerByName(name string) (*model.Player, error) {
-	for _, p := range mds.allPlayers {
+	for _, p := range mds.players {
 		if strings.EqualFold(p.Name, name) {
 			copy := *p
 			return &copy, nil
 		}
 	}
-	return nil, pkg.NewCodedError(fmt.Errorf("no player with name %s", name), http.StatusNotFound)
+	return nil, pkg.NewCodedErrorf(http.StatusNotFound, "no player with name %s", name)
 }
 
 func (mds *MemoryDataStore) PutPlayer(p *model.Player) error {
-	mds.allPlayers[p.ID] = p
+	mds.players[p.ID] = p
 	return nil
 }
 
@@ -67,11 +66,14 @@ func (mds *MemoryDataStore) PutPlayers(players []*model.Player) error {
 	return nil
 }
 
-func (mds *MemoryDataStore) seedPlayers(ids []string) {
+func (mds *MemoryDataStore) seedPlayers(ids []string) error {
 	for _, id := range ids {
-		_, ok := mds.allPlayers[id]
+		_, ok := mds.players[id]
 		if !ok {
-			mds.PutPlayer(&model.Player{ID: id})
+			if err := mds.PutPlayer(&model.Player{ID: id}); err != nil {
+				return err
+			}
 		}
 	}
+	return nil
 }

@@ -37,12 +37,27 @@ func (s *Server) StartHTTPServer(port string) error {
 
 	router.Use(loggerMiddleware)
 
-	router.Handle("/allDivisions", handler{s.GetDivisions})
+	router.Handle("/allDivisions", handler{s.GetAllDivisions})
 	router.Handle("/division", handler{s.GetDivision})
-	router.Handle("/allTeams", handler{s.GetTeams})
-	router.Handle("/team", handler{s.GetTeam})
+
+	router.Handle("/allGameStatsheets", handler{s.GetAllGameStatsheets})
+	router.Handle("/gameStatsheet", handler{s.GetGameStatsheet})
+
 	router.Handle("/allPlayers", handler{s.GetAllPlayers})
 	router.Handle("/players", handler{s.GetPlayers})
+
+	router.Handle("/allPlayerSeasonStatsheets", handler{s.GetAllPlayerSeasonStatsheets})
+	router.Handle("/playerSeasonStatsheets", handler{s.GetPlayerSeasonStatsheets})
+	router.Handle("/playerSeasonStatsheet", handler{s.GetPlayerSeasonStatsheet})
+
+	router.Handle("/allSeasonStatsheets", handler{s.GetAllSeasonStatsheets})
+	router.Handle("/seasonStatsheet", handler{s.GetSeasonStatsheet})
+
+	router.Handle("/allTeams", handler{s.GetAllTeams})
+	router.Handle("/team", handler{s.GetTeam})
+
+	router.Handle("/allTeamStatsheets", handler{s.GetAllTeamStatsheets})
+	router.Handle("/teamStatsheet", handler{s.GetTeamStatsheet})
 
 	listener, err := net.Listen("tcp", ":"+port)
 	if err != nil {

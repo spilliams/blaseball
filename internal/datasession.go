@@ -10,21 +10,41 @@ type DataStorageSession interface {
 	GetAllDivisions() (*model.DivisionList, error)
 	GetDivisionByID(string) (*model.Division, error)
 	GetDivisionByName(string) (*model.Division, error)
+	PutDivision(*model.Division) error
 
 	GetAllPlayers() (*model.PlayerList, error)
 	GetPlayersByID([]string) (*model.PlayerList, error)
 	GetPlayerByID(string) (*model.Player, error)
 	GetPlayerByName(string) (*model.Player, error)
+	PutPlayer(*model.Player) error
+	PutPlayers([]*model.Player) error
 
 	GetAllTeams() (*model.TeamList, error)
 	GetTeamByID(string) (*model.Team, error)
 	GetTeamByFullName(string) (*model.Team, error)
 	GetTeamByNickname(string) (*model.Team, error)
-
-	PutDivision(*model.Division) error
-	PutPlayer(*model.Player) error
-	PutPlayers([]*model.Player) error
 	PutTeam(*model.Team) error
+
+	GetAllSeasonStatsheets() ([]*model.SeasonStatsheet, error)
+	GetSeasonStatsheetByID(string) (*model.SeasonStatsheet, error)
+	PutSeasonStatsheet(*model.SeasonStatsheet) error
+	PutSeasonStatsheets([]*model.SeasonStatsheet) error
+
+	GetAllGameStatsheets() ([]*model.GameStatsheet, error)
+	GetGameStatsheetByID(string) (*model.GameStatsheet, error)
+	PutGameStatsheet(*model.GameStatsheet) error
+	PutGameStatsheets([]*model.GameStatsheet) error
+
+	GetAllTeamStatsheets() ([]*model.TeamStatsheet, error)
+	GetTeamStatsheetByID(string) (*model.TeamStatsheet, error)
+	PutTeamStatsheet(*model.TeamStatsheet) error
+	PutTeamStatsheets([]*model.TeamStatsheet) error
+
+	GetAllPlayerSeasonStatsheets() ([]*model.PlayerSeasonStatsheet, error)
+	GetPlayerSeasonStatsheetsByPlayerID(string) ([]*model.PlayerSeasonStatsheet, error)
+	GetPlayerSeasonStatsheetByID(string) (*model.PlayerSeasonStatsheet, error)
+	PutPlayerSeasonStatsheet(*model.PlayerSeasonStatsheet) error
+	PutPlayerSeasonStatsheets([]*model.PlayerSeasonStatsheet) error
 }
 
 // ServerDataSession represents a data session with the server built from this
@@ -44,4 +64,17 @@ type ServerDataSession interface {
 	GetTeamByID(string, bool) (*model.Team, error)
 	GetTeamByFullName(string, bool) (*model.Team, error)
 	GetTeamByNickname(string, bool) (*model.Team, error)
+
+	GetAllSeasonStatsheets() ([]*model.SeasonStatsheet, error)
+	GetSeasonStatsheetByID(string) (*model.SeasonStatsheet, error)
+
+	GetAllGameStatsheets() ([]*model.GameStatsheet, error)
+	GetGameStatsheetByID(string) (*model.GameStatsheet, error)
+
+	GetAllTeamStatsheets() ([]*model.TeamStatsheet, error)
+	GetTeamStatsheetByID(string) (*model.TeamStatsheet, error)
+
+	GetAllPlayerSeasonStatsheets() ([]*model.PlayerSeasonStatsheet, error)
+	GetPlayerSeasonStatsheetsByPlayerID(string) ([]*model.PlayerSeasonStatsheet, error)
+	GetPlayerSeasonStatsheetByID(string) (*model.PlayerSeasonStatsheet, error)
 }

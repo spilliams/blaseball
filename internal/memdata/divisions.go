@@ -1,7 +1,6 @@
 package memdata
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -10,8 +9,8 @@ import (
 )
 
 func (mds *MemoryDataStore) GetAllDivisions() (*model.DivisionList, error) {
-	divisions := make([]*model.Division, 0, len(mds.allDivisions))
-	for _, d := range mds.allDivisions {
+	divisions := make([]*model.Division, 0, len(mds.divisions))
+	for _, d := range mds.divisions {
 		copy := *d
 		divisions = append(divisions, &copy)
 	}
@@ -19,26 +18,25 @@ func (mds *MemoryDataStore) GetAllDivisions() (*model.DivisionList, error) {
 }
 
 func (mds *MemoryDataStore) GetDivisionByID(id string) (*model.Division, error) {
-	division, ok := mds.allDivisions[id]
+	division, ok := mds.divisions[id]
 	if !ok {
-		return nil, pkg.NewCodedError(fmt.Errorf("no Division with id %s", id), http.StatusNotFound)
+		return nil, pkg.NewCodedErrorf(http.StatusNotFound, "no Division with id %s", id)
 	}
 	copy := *division
 	return &copy, nil
 }
 
 func (mds *MemoryDataStore) GetDivisionByName(name string) (*model.Division, error) {
-	for _, d := range mds.allDivisions {
+	for _, d := range mds.divisions {
 		if strings.EqualFold(d.Name, name) {
 			copy := *d
 			return &copy, nil
 		}
 	}
-	return nil, pkg.NewCodedError(fmt.Errorf("no Division with name %s", name), http.StatusNotFound)
+	return nil, pkg.NewCodedErrorf(http.StatusNotFound, "no Division with name %s", name)
 }
 
 func (mds *MemoryDataStore) PutDivision(div *model.Division) error {
-	mds.allDivisions[div.ID] = div
-	mds.seedTeams(div.TeamIDs)
-	return nil
+	mds.divisions[div.ID] = div
+	return mds.seedTeams(div.TeamIDs)
 }

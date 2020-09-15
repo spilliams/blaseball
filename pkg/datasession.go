@@ -14,4 +14,9 @@ type OfficialDataSession interface {
 
 	GetAllTeams() ([]*model.Team, error)
 	GetTeamByID(string) (*model.Team, error)
+
+	GetSeasonStatsheetsByID([]string) ([]*model.SeasonStatsheet, error)
+	GetGameStatsheetsByID([]string) ([]*model.GameStatsheet, error)
+	GetTeamStatsheetsByID([]string) ([]*model.TeamStatsheet, error)
+	GetPlayerSeasonStatsheetsByID([]string) ([]*model.PlayerSeasonStatsheet, error)
 }

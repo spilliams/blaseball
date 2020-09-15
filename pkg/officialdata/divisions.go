@@ -2,7 +2,6 @@ package officialdata
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/spilliams/blaseball/pkg/model"
 )
@@ -13,11 +12,8 @@ func (b *BlaseballAPI) GetAllDivisions() ([]*model.Division, error) {
 		return nil, err
 	}
 	var divisions []*model.Division
-	if err = json.Unmarshal(resp.Body(), &divisions); err != nil {
-		return nil, fmt.Errorf("couldn't unmarshal response: %v", err)
-	}
-
-	return divisions, nil
+	err = json.Unmarshal(resp.Body(), &divisions)
+	return divisions, err
 }
 
 func (b *BlaseballAPI) GetDivisionByID(id string) (*model.Division, error) {
